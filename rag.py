@@ -13,18 +13,35 @@ def carregar_documento():
         return arquivo.read()
 
 
+def _eh_titulo(paragrafo):
+    return paragrafo == paragrafo.upper() and any(
+        letra.isalpha() for letra in paragrafo
+    )
+
+
 def criar_secoes():
     documento = carregar_documento()
-    partes = documento.split("\n\n")
+    paragrafos = [
+        paragrafo.strip()
+        for paragrafo in documento.split("\n\n")
+        if paragrafo.strip()
+    ]
 
     secoes = []
+    titulo = None
+    conteudo = []
 
-    for indice in range(1, len(partes), 2):
-        titulo = partes[indice]
+    for paragrafo in paragrafos:
+        if _eh_titulo(paragrafo):
+            if titulo is not None and conteudo:
+                secoes.append(titulo + "\n\n" + "\n\n".join(conteudo))
+            titulo = paragrafo
+            conteudo = []
+        elif titulo is not None:
+            conteudo.append(paragrafo)
 
-        if indice + 1 < len(partes):
-            conteudo = partes[indice + 1]
-            secoes.append(titulo + "\n\n" + conteudo)
+    if titulo is not None and conteudo:
+        secoes.append(titulo + "\n\n" + "\n\n".join(conteudo))
 
     return secoes
 
