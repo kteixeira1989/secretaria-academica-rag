@@ -1,3 +1,5 @@
 streamlit
 pytest
 sentence-transformers
+google-genai
+torchvision

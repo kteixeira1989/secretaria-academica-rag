@@ -1,9 +1,16 @@
+import os
 from pathlib import Path
+
+from google import genai
+from google.genai import errors
 from sentence_transformers import SentenceTransformer, util
 
 
 # Modelo gratuito de embeddings
 modelo = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+# Modelo gratuito de geração (free tier do Gemini)
+MODELO_GERACAO = "gemini-3.8-flash"
 
 
 def carregar_documento():
@@ -71,3 +78,34 @@ def buscar_contexto(pergunta):
         return "Não encontrei essa informação nos documentos disponíveis."
 
     return secoes[melhor_indice]
+
+
+def montar_prompt(pergunta, contexto):
+    return (
+        "Responda à pergunta usando apenas o contexto abaixo, em português, "
+        "de forma direta. Se a resposta não estiver no contexto, diga que "
+        "não encontrou a informação.\n\n"
+        f"Contexto:\n{contexto}\n\n"
+        f"Pergunta: {pergunta}\n\n"
+        "Resposta:"
+    )
+
+
+def gerar_resposta(pergunta, contexto):
+    if contexto.startswith("Não encontrei"):
+        return contexto
+
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    try:
+        resposta = client.models.generate_content(
+            model=MODELO_GERACAO,
+            contents=montar_prompt(pergunta, contexto),
+        )
+    except errors.APIError as erro:
+        if erro.code == 503:
+            return (
+                "O serviço de IA está temporariamente indisponível. "
+                "Tente novamente em alguns instantes."
+            )
+        raise
+    return resposta.text
