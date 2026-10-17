@@ -83,8 +83,10 @@ def buscar_contexto(pergunta):
 def montar_prompt(pergunta, contexto):
     return (
         "Responda à pergunta usando apenas o contexto abaixo, em português, "
-        "de forma direta. Se a resposta não estiver no contexto, diga que "
-        "não encontrou a informação.\n\n"
+        "de forma direta. Você pode fazer inferências simples e cálculos "
+        "aritméticos diretamente derivados do contexto. Se a resposta não "
+        "estiver no contexto e não puder ser deduzida dele, diga que não "
+        "encontrou a informação.\n\n"
         f"Contexto:\n{contexto}\n\n"
         f"Pergunta: {pergunta}\n\n"
         "Resposta:"

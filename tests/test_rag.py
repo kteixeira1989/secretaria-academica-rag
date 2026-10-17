@@ -25,6 +25,12 @@ def test_montar_prompt_inclui_pergunta_e_contexto():
     assert "75%" in prompt
 
 
+def test_montar_prompt_permite_inferencias_simples():
+    prompt = montar_prompt("Quanto posso faltar nas aulas?", "FREQUÊNCIA MÍNIMA: 75%")
+    assert "inferências" in prompt
+    assert "cálculos" in prompt
+
+
 def test_gerar_resposta_erro_temporario(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "chave-falsa")
 
